@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧨</text></svg>" /> 
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🧨 Ninth Circle Date Picker™</title>
+<style>
+:root{--bg:#0b0b0b;--accent:#ff4d4d;--muted:#bbb}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(135deg,#0b0b0b 0%, #111 60%); color:#eee}
+.wrap{max-width:980px;margin:18px auto;padding:22px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 6px 30px rgba(0,0,0,0.7)}
+h1{font-size:20px;margin:0 0 16px;display:flex;align-items:center;gap:10px}
+p{margin:8px 0}
+.step{padding:14px;border-radius:8px;margin:12px 0;background:rgba(255,255,255,0.01);border:1px dashed rgba(255,255,255,0.03)}
+select, input[type="text"], button{font-size:15px;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.35);color:#fff;cursor:pointer;position:relative;z-index:9999;}
+#millennium{width:260px;height:36px;overflow:auto}
+#century{display:none;width:260px;height:36px}
+.slider-wrap{display:flex;align-items:center;gap:10px}
+input[type=range]{-webkit-appearance:none;height:8px;background:transparent;width:300px}
+input[type=range]::-webkit-slider-runnable-track{height:8px;background:linear-gradient(90deg,#222,#333);border-radius:4px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:3px;height:26px;background:var(--accent);border-radius:1px;box-shadow:0 0 0 8px rgba(255,77,77,0.06)}
+input[type=range]:focus{outline:none}
+.cube-stage{perspective:1200px;height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;}
+.cube{width:160px;height:160px;position:relative;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.9,.2,1);}
+.face{position:absolute;width:160px;height:160px;display:flex;align-items:center;justify-content:center;font-size:40px;border-radius:8px;color:#000;backface-visibility:hidden;transform-origin:center center;}
+.f0{transform:rotateY(0deg) translateZ(120px)}
+.f1{transform:rotateY(30deg) translateZ(120px)}
+.f2{transform:rotateY(60deg) translateZ(120px)}
+.f3{transform:rotateY(90deg) translateZ(120px)}
+.f4{transform:rotateY(120deg) translateZ(120px)}
+.f5{transform:rotateY(150deg) translateZ(120px)}
+.f6{transform:rotateY(180deg) translateZ(120px)}
+.f7{transform:rotateY(210deg) translateZ(120px)}
+.f8{transform:rotateY(240deg) translateZ(120px)}
+.f9{transform:rotateY(270deg) translateZ(120px)}
+.f10{transform:rotateY(300deg) translateZ(120px)}
+.f11{transform:rotateY(330deg) translateZ(120px)}
+.spin-hint{font-size:12px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px;max-width:560px}
+.cell{min-height:44px;border-radius:6px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:6px;user-select:none}
+.cell.fake{background:linear-gradient(135deg, rgba(255,0,0,0.06), rgba(255,165,0,0.03));}
+.controls{display:flex;gap:8px;margin-top:14px}
+.controls button{padding:10px 14px}
+.clippy{position:fixed;right:-1400px;bottom:15px;background:linear-gradient(180deg,#fff,#eee);color:#111;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:flex;gap:10px;align-items:center;transition:right 0.8s}
+@media(max-width:864px){.clippy{top:15px;height:25px;}}
+#result{font-size:16px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+<h1>🧨 Ninth Circle Date Picker™</h1>
+
+<div class="step" id="step-1">
+<p><strong>Step 1 — Choose Millennium (Scroll only)</strong></p>
+<select id="millennium" size="4">
+<option value="0000">0000–0999</option>
+<option value="1000">1000–1999</option>
+<option value="2000" selected>2000–2999</option>
+<option value="3000">3000–3999</option>
+</select>
+</div>
+
+<div class="step" id="step-2">
+<p><strong>Step 2 — Choose Century</strong></p>
+<select id="century"></select>
+</div>
+
+<div class="step" id="step-3">
+<p><strong>Step 3 — Choose Year</strong></p>
+<div class="slider-wrap">
+<input id="year-slider" type="range" min="2000.0" max="2099.9" step="0.1" value="2024.5" />
+<div style="width:60px;text-align:center"><span id="year-value">2024.5</span></div>
+</div>
+<p class="spin-hint">(Overshoot and you'll be sent back to Step 1.)</p>
+</div>
+
+<div class="step" id="step-4">
+<p><strong>Step 4 — Choose Month</strong></p>
+<div class="cube-stage">
+<div class="cube" id="cube">
+<div class="face f0">❄️</div>
+<div class="face f1">❤️</div>
+<div class="face f2">🍀</div>
+<div class="face f3">🌷</div>
+<div class="face f4">🌼</div>
+<div class="face f5">☀️</div>
+<div class="face f6">🏖️</div>
+<div class="face f7">🍉</div>
+<div class="face f8">🍂</div>
+<div class="face f9">🍁</div>
+<div class="face f10">🦃</div>
+<div class="face f11">🎄</div>
+</div>
+</div>
+<div style="text-align:center">
+<button id="stop-cube">Stop Spin</button>
+<div class="spin-hint">Click to stop the spinning month.</div>
+</div>
+</div>
+
+<div class="step" id="step-5">
+<p><strong>Step 5 — Choose Day</strong></p>
+<div class="grid" id="grid"></div>
+<p class="spin-hint">Click squares that contain a <em>weekday</em> when prompted by the CAPTCHA. Hesitate = reset.</p>
+</div>
+
+<div class="step" id="step-6">
+<p><strong>Step 6 — Confirm in Roman Numerals</strong></p>
+<input id="roman" placeholder="Type like XXV-X-MMXXV" style="width:260px" />
+<p class="spin-hint">Autocorrect may change your correct answer into nonsense. Submitting with wrong input resets everything.</p>
+</div>
+
+<div class="controls">
+<button id="btn-next">Next</button>
+<button id="btn-cancel">Cancel</button>
+<button id="btn-ok">OK</button>
+</div>
+
+<div id="result"></div>
+</div>
+
+<div class="clippy" id="clippy">📎Clippy: It looks like you're trying to pick a date. Want me to make it harder?🔥<button id="clippy-btn">Yes</button></div>
+
+<audio id="tick-sound"><source src="https://cdn.freesound.org/previews/67/67542_71257-lq.ogg" type="audio/ogg"></audio>
+
+<script>
+const state={millennium:null,century:null,year:null,month:null,day:null,dateChosen:false,nextClicked:false};
+const app=document.getElementById('app');
+const result=document.getElementById('result');
+const mille=document.getElementById('millennium');
+mille.selectedIndex=1;
+mille.addEventListener('change',()=>{state.millennium=mille.value;showCenturyRandomized();});
+const centurySelect=document.getElementById('century');
+function showCenturyRandomized(){
+const options=['Random','2100s','2000s','2500s','1800s','2200s'];
+for(let i=options.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[options[i],options[j]]=[options[j],options[i]]}
+centurySelect.innerHTML='';
+options.forEach(o=>{const el=document.createElement('option');el.textContent=o;centurySelect.appendChild(el)});
+centurySelect.style.display='inline-block';
+result.textContent='';
+}
+centurySelect.addEventListener('change',()=>{state.century=centurySelect.value;result.textContent='Century selected.';});
+const slider=document.getElementById('year-slider');
+const yearValue=document.getElementById('year-value');
+const tick=document.getElementById('tick-sound');
+slider.addEventListener('input',()=>{yearValue.textContent=parseFloat(slider.value).toFixed(1);tick.currentTime=0;tick.play();});
+slider.addEventListener('change',()=>{state.year=Math.round(parseFloat(slider.value));result.textContent='Year locked in.';});
+function sabotage(msg){
+result.textContent=msg;
+setTimeout(()=>{state.millennium=null;state.century=null;state.year=null;state.month=null;state.day=null;state.dateChosen=false;state.nextClicked=false;centurySelect.style.display='none';mille.selectedIndex=1;slider.value=2024.5;yearValue.textContent=slider.value;startCubeAutospin();buildGrid();},900);
+}
+const cube=document.getElementById('cube');
+let autoSpinInterval=null;
+let currentAngle=0;
+let spinning=true;
+const monthEmojis=['❄️','❤️','🍀','🌷','🌼','☀️','🏖️','🍉','🍂','🍁','🦃','🎄'];
+function startCubeAutospin(){
+spinning=true;
+if(autoSpinInterval) clearInterval(autoSpinInterval);
+autoSpinInterval=setInterval(()=>{currentAngle+=5+Math.random()*5;cube.style.transform=`rotateY(${currentAngle}deg) rotateX(-15deg) translateZ(0px)`;},80);
+}
+startCubeAutospin();
+document.getElementById('stop-cube').addEventListener('click',()=>{
+if(autoSpinInterval) clearInterval(autoSpinInterval);
+spinning=false;
+let normalized=((currentAngle%360)+360)%360;
+let rawSector=Math.round(normalized/30);
+let sector=rawSector%12;
+let snappedAngle=sector*30;
+let visibleFace=(12-sector)%12;
+state.month=visibleFace+1;
+result.textContent='Month locked in: '+monthEmojis[visibleFace]+'';
+cube.style.transform=`rotateY(${snappedAngle}deg) rotateX(-15deg) translateZ(0px)`;
+});
+const grid=document.getElementById('grid');
+function buildGrid(){
+grid.innerHTML='';
+const cells=[];const realDates=[];
+for(let i=1;i<=31;i++) realDates.push(i);
+const pool=[];
+for(let i=0;i<30;i++){if(Math.random()>0.25&&realDates.length)pool.push(realDates.splice(Math.floor(Math.random()*realDates.length),1)[0]);else pool.push(['32','0','Feb 31','∞','-'][Math.floor(Math.random()*5)]);}
+while(pool.length<42)pool.push(Math.random()>0.4?('X'+Math.floor(Math.random()*40)):Math.floor(Math.random()*31)+1);
+const fonts=['Comic Sans MS','Papyrus','Courier New','Wingdings','Arial','Times New Roman'];
+pool.forEach(p=>{const cell=document.createElement('div');cell.className='cell';if(['32','0','Feb 31','∞','-'].includes(p.toString())||(typeof p==='string'&&p.startsWith('X')))cell.classList.add('fake');cell.textContent=p;cell.style.fontFamily=fonts[Math.floor(Math.random()*fonts.length)];cell.addEventListener('click',()=>{if(cell.classList.contains('fake'))return sabotage('Fake date clicked! Resetting...');state.day=p;result.textContent='Day chosen: '+p;});grid.appendChild(cell);});
+}
+buildGrid();
+document.getElementById('btn-next').addEventListener('click',()=>{if(!state.year||!state.month||!state.day)return sabotage('Overshoot or missing step! Resetting...');state.dateChosen=true;state.nextClicked=true;result.textContent='Date chosen. Press OK to confirm.';});
+function toRoman(num){const val=[1000,900,500,400,100,90,50,40,10,9,5,4,1];const sym=["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"];let roman="";for(let i=0;i<val.length;i++){while(num>=val[i]){num-=val[i];roman+=sym[i];}}return roman;}
+document.getElementById('btn-ok').addEventListener('click',()=>{
+if(!state.dateChosen||!state.nextClicked)return;
+let day=parseInt(state.day);let month=parseInt(state.month);let year=parseInt(state.year);
+if(isNaN(day)||isNaN(month)||isNaN(year))return sabotage('❌ Invalid internal date. Resetting...');
+const correctRoman=`${toRoman(day)}-${toRoman(month)}-${toRoman(year)}`;
+const userRoman=document.getElementById('roman').value.trim().toUpperCase().replace(/\s+/g,'');
+if(userRoman===correctRoman){result.textContent=`✅ Correct! Final date: ${day}-${month}-${year} (${userRoman})`;}
+else{
+const normalizedUser=userRoman.replace(/O/g,'0').replace(/MMO/g,'MMM').replace(/MMM?O/g,'MMM');
+if(normalizedUser===correctRoman){result.textContent=`✅ Correct! Final date: ${day}-${month}-${year} (${userRoman})`;}
+else sabotage(`❌ Incorrect Roman numeral. Expected ${correctRoman}, got ${userRoman}. Resetting...`);
+}
+});
+document.getElementById('btn-cancel').addEventListener('click',()=>{sabotage('User pressed Cancel. Resetting...');});
+const clippy=document.getElementById('clippy');
+window.addEventListener('scroll',()=>{const step1Bottom=document.getElementById('step-1').getBoundingClientRect().bottom+window.scrollY;if(window.scrollY>step1Bottom){clippy.style.right='20px';}else{clippy.style.right='-1400px';}});
+document.getElementById('clippy-btn').addEventListener('click',()=>{alert('Clippy is making it harder!');});
+</script>
+</body>
+</html>
