@@ -42,6 +42,8 @@ input[type=range]:focus{outline:none}
 .controls{display:flex;gap:8px;margin-top:14px}
 .controls button{padding:10px 14px}
 .clippy{position:fixed;right:-1400px;bottom:15px;background:linear-gradient(180deg,#fff,#eee);color:#111;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:flex;gap:10px;align-items:center;transition:right 0.8s}
+.timer{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);background:linear-gradient(135deg,#4d9eff,#1a7aff);color:#fff;padding:24px 40px;border-radius:16px;font-size:32px;font-weight:bold;box-shadow:0 8px 30px rgba(77,158,255,0.5);display:none;z-index:10000;animation:pulse 1s infinite;min-width:200px;text-align:center;font-family:monospace}
+@keyframes pulse{0%,100%{transform:translate(-50%, -50%) scale(1)}50%{transform:translate(-50%, -50%) scale(1.05)}}
 @media(max-width:864px){.clippy{top:15px;height:50px;margin-left:15px;z-index:99999}}
 #result{font-size:16px;margin-top:10px}
 </style>
@@ -121,6 +123,8 @@ input[type=range]:focus{outline:none}
 
 <div class="clippy" id="clippy">📎Clippy: It looks like you're trying to pick a date. Want me to make it harder?🔥<button id="clippy-btn">Yes</button></div>
 
+<div class="timer" id="timer">⏱️ Time: <span id="timer-value" style="display:inline-block;min-width:33px;text-align:right;">30</span>s</div>
+  
 <audio id="tick-sound"><source src="https://cdn.freesound.org/previews/67/67542_71257-lq.ogg" type="audio/ogg"></audio>
 
 <script>
@@ -202,10 +206,40 @@ else sabotage(`❌ Incorrect Roman numeral. Expected ${correctRoman}, got ${user
 document.getElementById('btn-cancel').addEventListener('click',()=>{sabotage('User pressed Cancel. Resetting...');});
 const clippy=document.getElementById('clippy');
 window.addEventListener('scroll',()=>{const step1Bottom=document.getElementById('step-1').getBoundingClientRect().bottom+window.scrollY;if(window.scrollY>step1Bottom){clippy.style.right='20px';}else{clippy.style.right='-1400px';}});
-document.getElementById('clippy-btn').addEventListener('click',()=>{alert('Clippy is making it harder!');});
+const clippy=document.getElementById('clippy');
+const timer=document.getElementById('timer');
+let timerInterval=null;
+let timeRemaining=30;
+window.addEventListener('scroll',()=>{const step1Bottom=document.getElementById('step-1').getBoundingClientRect().bottom+window.scrollY;if(window.scrollY>step1Bottom){clippy.style.right='20px';}else{clippy.style.right='-1400px';}});
+document.getElementById('clippy-btn').addEventListener('click',()=>{
+clippy.style.display='none';
+timer.style.display='block';
+timer.innerHTML='⏱️ Time: <span id="timer-value" style="display:inline-block;min-width:60px;text-align:right">30</span>s';
+const timerValue=document.getElementById('timer-value');
+timeRemaining=30;
+timerValue.textContent=timeRemaining;
+if(timerInterval)clearInterval(timerInterval);
+timerInterval=setInterval(()=>{
+timeRemaining--;
+timerValue.textContent=timeRemaining;
+if(timeRemaining<=10){timer.style.background='linear-gradient(135deg,#ff0000,#cc0000)';}
+if(timeRemaining<=0){
+clearInterval(timerInterval);
+timer.style.background='linear-gradient(135deg,#4d9eff,#1a7aff)';
+timer.innerHTML='<div style="text-align:center"><span style="font-size:65px">📎</span><br>TIME\'S UP!<br>Clippy wins. Resetting...</div>';
+setTimeout(()=>{
+timer.style.display='none';
+clippy.style.display='flex';
+sabotage('');
+timeRemaining=30;
+},2000);
+}
+},1000);
+});
 </script>
 </body>
 
 </html>
+
 
 
