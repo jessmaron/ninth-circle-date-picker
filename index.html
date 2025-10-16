@@ -42,7 +42,7 @@ input[type=range]:focus{outline:none}
 .controls{display:flex;gap:8px;margin-top:14px}
 .controls button{padding:10px 14px}
 .clippy{position:fixed;right:-1400px;bottom:15px;background:linear-gradient(180deg,#fff,#eee);color:#111;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:flex;gap:10px;align-items:center;transition:right 0.8s}
-@media(max-width:864px){.clippy{top:15px;height:25px;}}
+@media(max-width:864px){.clippy{top:15px;height:50px;margin-left:15px;z-index:99999}}
 #result{font-size:16px;margin-top:10px}
 </style>
 </head>
@@ -207,3 +207,4 @@ document.getElementById('clippy-btn').addEventListener('click',()=>{alert('Clipp
 </body>
 
 </html>
+
