@@ -144,7 +144,7 @@ const slider=document.getElementById('year-slider');
 const yearValue=document.getElementById('year-value');
 const tick=document.getElementById('tick-sound');
 slider.addEventListener('input',()=>{yearValue.textContent=parseFloat(slider.value).toFixed(1);tick.currentTime=0;tick.play();});
-slider.addEventListener('change',()=>{state.year=Math.round(parseFloat(slider.value));result.textContent='Year locked in.';});
+slider.addEventListener('change',()=>{const val=parseFloat(slider.value);if(val%1!==0)return sabotage('⚠️ Decimal year detected! You overshot. Resetting...');state.year=Math.round(val);result.textContent='Year locked in.';});
 function sabotage(msg){
 result.textContent=msg;
 setTimeout(()=>{state.millennium=null;state.century=null;state.year=null;state.month=null;state.day=null;state.dateChosen=false;state.nextClicked=false;centurySelect.style.display='none';mille.selectedIndex=1;slider.value=2024.5;yearValue.textContent=slider.value;startCubeAutospin();buildGrid();},900);
@@ -207,4 +207,5 @@ document.getElementById('clippy-btn').addEventListener('click',()=>{alert('Clipp
 </body>
 
 </html>
+
 
