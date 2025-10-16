@@ -124,7 +124,7 @@ input[type=range]:focus{outline:none}
 <div class="clippy" id="clippy">📎Clippy: It looks like you're trying to pick a date. Want me to make it harder?🔥<button id="clippy-btn">Yes</button></div>
 
 <div class="timer" id="timer">⏱️ Time: <span id="timer-value" style="display:inline-block;min-width:33px;text-align:right;">30</span>s</div>
-  
+
 <audio id="tick-sound"><source src="https://cdn.freesound.org/previews/67/67542_71257-lq.ogg" type="audio/ogg"></audio>
 
 <script>
@@ -205,8 +205,6 @@ else sabotage(`❌ Incorrect Roman numeral. Expected ${correctRoman}, got ${user
 });
 document.getElementById('btn-cancel').addEventListener('click',()=>{sabotage('User pressed Cancel. Resetting...');});
 const clippy=document.getElementById('clippy');
-window.addEventListener('scroll',()=>{const step1Bottom=document.getElementById('step-1').getBoundingClientRect().bottom+window.scrollY;if(window.scrollY>step1Bottom){clippy.style.right='20px';}else{clippy.style.right='-1400px';}});
-const clippy=document.getElementById('clippy');
 const timer=document.getElementById('timer');
 let timerInterval=null;
 let timeRemaining=30;
@@ -238,8 +236,4 @@ timeRemaining=30;
 });
 </script>
 </body>
-
 </html>
-
-
-
